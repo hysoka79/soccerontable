@@ -212,7 +212,7 @@ class YoutubeVideo:
 
         # Release everything if job is finished
         out.release()
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
 
     # ------------------------------------------------------------------------------------------------------------------
 
@@ -226,11 +226,15 @@ class YoutubeVideo:
         else:
             h, w = self.shape[:2]
             openposebin = './build/examples/openpose/openpose.bin'
-            tmp_dir = join(self.path_to_dataset, 'tmp')
+            # tmp_dir = join(self.path_to_dataset, 'tmp')
+            tmp_dir = '/home/hysoka79/soccer_new/barcelona/tmp'
+            print("================="+tmp_dir+"=================") #tmp_dir = barcelona/tmp
+            print("frame_basename: "+self.frame_basenames[0])
+            print("frame_basename: "+self.frame_fullnames[0])
             if not exists(tmp_dir):
                 os.mkdir(tmp_dir)
 
-            for i, basename in enumerate(tqdm(self.frame_basenames)):
+            for i, basename in enumerate(tqdm(self.frame_basenames)): # tqdm(gen progress bar)
 
                 # Remove previous files
                 previous_files = [f for f in os.listdir(tmp_dir)]
@@ -239,14 +243,16 @@ class YoutubeVideo:
 
                 img = self.get_frame(i)
                 bbox = self.bbox[basename]
-
+                # print("=================bbox=================")
+                # print(bbox) # n * 5
                 # save the crops in a temp file
-                for j in range(bbox.shape[0]):
+                for j in range(bbox.shape[0]): # locate the people in frame
                     x1, y1, x2, y2 = bbox[j, 0:4]
                     x1, y1 = int(np.maximum(np.minimum(x1 - pad, w - 1), 0)), int(
                         np.maximum(np.minimum(y1 - pad, h - 1), 0))
                     x2, y2 = int(np.maximum(np.minimum(x2 + pad, w - 1), 0)), int(
                         np.maximum(np.minimum(y2 + pad, h - 1), 0))
+                    
                     crop = img[y1:y2, x1:x2, :]
 
                     # Save crop

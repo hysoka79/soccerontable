@@ -34,6 +34,11 @@ def grid_search_focal_length(points3d, points2d, h, w, same_f=False, fx_step=20)
                 fy = j
 
             A = intrinsic_matrix_from_focal_length(fx, fy, h, w)
+            print("check")
+            print(points3d)
+            print("=================================")
+            print(points2d)
+            print("=================================")
             _, rvec, tvec = cv2.solvePnP(points3d, points2d, A, None)
             reproj, _ = cv2.projectPoints(points3d, rvec, tvec, A, None)
             reproj = np.squeeze(reproj)

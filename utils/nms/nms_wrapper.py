@@ -6,6 +6,8 @@
 # --------------------------------------------------------
 
 # from utils.nms.nms.gpu_nms import gpu_nms
+import pyximport
+pyximport.install()
 from utils.nms.nms.cpu_nms import cpu_nms
 
 

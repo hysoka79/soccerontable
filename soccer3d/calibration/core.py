@@ -60,10 +60,10 @@ def _calibrate_camera_dist_transf(A, R, T, dist_transf, points3d):
 def _set_correspondences(img, field_img_path='./demo/data/field.png'):
 
     field_img = io.imread(field_img_path)
-
+    #print(img)
     h2, w2 = field_img.shape[0:2]
     W, H = 104.73, 67.74
-
+    #plt.figure()
     fig, ax = plt.subplots(1, 2)
     ax[0].imshow(img)
     ax[1].imshow(field_img)
@@ -75,8 +75,9 @@ def _set_correspondences(img, field_img_path='./demo/data/field.png'):
     points3d = []
 
     def onclick(event):
-        # print('button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-        #       (event.button, event.x, event.y, event.xdata, event.ydata))
+        print("here")
+        print('button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+               (event.button, event.x, event.y, event.xdata, event.ydata))
         x, y = event.xdata, event.ydata
         if event.inaxes.axes.get_position().x0 < 0.5:
             ax[0].plot(x, y, 'r.', ms=10)
@@ -85,12 +86,11 @@ def _set_correspondences(img, field_img_path='./demo/data/field.png'):
             ax[1].plot(x, y, 'b+', ms=10)
             points3d.append([x, 0, y])
         plt.show()
-
     cid = fig.canvas.mpl_connect('button_press_event', onclick)
     plt.show()
     points2d = np.array(points2d)
     points3d = np.array(points3d)
-
+    print(points3d)
     points3d[:, 0] = ((points3d[:, 0] - w2 / 2.) / w2) * W
     points3d[:, 2] = ((points3d[:, 2] - h2 / 2.) / h2) * H
 
@@ -111,7 +111,7 @@ def calibrate_by_click(img, mask, edge_sfactor=0.5, field_img_path='./demo/data/
     points_3d_cv = points3d[:, np.newaxis, :].astype(np.float32)
     points_2d_cv = points2d[:, np.newaxis, :].astype(np.float32)
 
-    _, rvec, tvec, _ = cv2.solvePnPRansac(points_3d_cv, points_2d_cv, A, None)
+    _, rvec, tvec, _ = cv2.solvePnPRansac(points_3d_cv, points_2d_cv, A, None) # 旋轉向量rvec和平移向量tvec得到變換矩陣
     rvec, tvec = np.squeeze(rvec), np.squeeze(tvec)
     R, _ = cv2.Rodrigues(rvec)
     T = np.array([tvec]).T
@@ -173,12 +173,12 @@ def calibrate_from_initialization(img, mask, A_init, R_init, T_init, edge_sfacto
     edges = image_utils.robust_edge_detection(cv2.resize(img, None, fx=edge_sfactor, fy=edge_sfactor))
 
     edges = cv2.resize(edges, None, fx=1. / edge_sfactor, fy=1. / edge_sfactor)
-    edges = cv2.Canny(edges.astype(np.uint8) * 255, 100, 200) / 255.0
+    edges = cv2.Canny(edges.astype(np.uint8) * 255, 100, 200) / 255.0 # find edge
 
     mask = cv2.dilate(mask, np.ones((25, 25), dtype=np.uint8))
 
     edges = edges * (1 - mask)
-    dist_transf = cv2.distanceTransform((1 - edges).astype(np.uint8), cv2.DIST_L2, 0)
+    dist_transf = cv2.distanceTransform((1 - edges).astype(np.uint8), cv2.DIST_L2, 0) # distance to the edge
 
     cam_init = cam_utils.Camera('tmp', A_init, R_init, T_init, h, w)
     template, field_mask = draw_utils.draw_field(cam_init)

@@ -107,6 +107,7 @@ int main(int argc, char** argv )
         boost::replace_all(outname, vm["extension"].as<std::string>(), ".png");
         boost::replace_all(outname, "images", "pose_masks");
         imwrite(outname, outimg);
+	std::cout << "write " << outname << "\n";
 
 //        clock_t end = clock();
 //        double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
