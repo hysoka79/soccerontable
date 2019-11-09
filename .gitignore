@@ -6,7 +6,6 @@
 *.par
 *.json
 *.png
-*.jpg
 *.bz2
 *.ply
 *.so
